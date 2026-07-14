@@ -1,5 +1,5 @@
 {
-  "name": "web_canonicals_ru",
+  "name": "mesto",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -19,7 +19,8 @@
     "build": "tsc",
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint . --ext .ts,.js"
   },
   "eslintConfig": {
     "extends": [
@@ -43,6 +44,8 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.1",
+    "@typescript-eslint/eslint-plugin": "^8.64.0",
+    "@typescript-eslint/parser": "^8.64.0",
     "dotenv": "^16.0.2",
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -58,7 +61,7 @@
     "url": "git+https://github.com/yandex-praktikum/nodejs-mesto-frontend.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "gulnara bazhina",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/yandex-praktikum/nodejs-mesto-frontend/issues"

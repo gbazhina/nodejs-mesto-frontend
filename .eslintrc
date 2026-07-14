@@ -37,7 +37,9 @@
                 "js": "never",
                 "ts": "never"
             }
-        ]
-    },
-    "no-underscore-dangle": ["error", { "allow": ["_id"] }]
+        ],
+      "no-underscore-dangle": ["error", { "allow": ["_id"] }],
+      "quotes": ["error", "double"],
+      "strict": "off"
+    }
 }

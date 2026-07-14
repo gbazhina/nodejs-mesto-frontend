@@ -1,14 +1,13 @@
 import { webcrypto } from "node:crypto";
+import express, { Application, NextFunction, Request, Response } from "express";
+import mongoose from "mongoose";
+import userRouter from "./routes/users";
+import cardsRouter from "./routes/cards";
 
 // Полифил для глобального crypto (Mongoose использует его для генерации ObjectId)
 if (!globalThis.crypto) {
   (globalThis as any).crypto = webcrypto;
 }
-
-import express, { Application, NextFunction, Request, Response } from "express";
-import mongoose from "mongoose";
-import userRouter from "./routes/users";
-import cardsRouter from "./routes/cards";
 
 const app: Application = express();
 const PORT: number = 3000;
