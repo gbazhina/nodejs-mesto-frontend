@@ -1,11 +1,13 @@
 {
-  "name": "web_canonicals_ru",
+  "name": "mesto",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "express": "^5.2.1",
+    "mongoose": "^9.7.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.2.0",
@@ -13,10 +15,12 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "ts-node src/app.ts",
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint . --ext .ts,.js"
   },
   "eslintConfig": {
     "extends": [
@@ -24,6 +28,7 @@
       "react-app/jest"
     ]
   },
+  "lint": "npx eslint src/**/*.ts || true",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -37,6 +42,29 @@
     ]
   },
   "devDependencies": {
-    "dotenv": "^16.0.2"
-  }
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.1.1",
+    "@typescript-eslint/eslint-plugin": "^8.64.0",
+    "@typescript-eslint/parser": "^8.64.0",
+    "dotenv": "^16.0.2",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.32.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^6.0.3"
+  },
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yandex-praktikum/nodejs-mesto-frontend.git"
+  },
+  "keywords": [],
+  "author": "gulnara bazhina",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yandex-praktikum/nodejs-mesto-frontend/issues"
+  },
+  "homepage": "https://github.com/yandex-praktikum/nodejs-mesto-frontend#readme"
 }
