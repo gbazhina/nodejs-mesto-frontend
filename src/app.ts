@@ -8,6 +8,7 @@ if (!globalThis.crypto) {
 import express, { Application, NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import userRouter from "./routes/users";
+import cardsRouter from "./routes/cards";
 
 const app: Application = express();
 const PORT: number = 3000;
@@ -15,30 +16,26 @@ const DB_URL: string = "mongodb://localhost:27017/mestodb";
 
 async function startServer() {
   try {
-    // 1. Подключаемся к MongoDB
     await mongoose.connect(DB_URL);
     console.log("Успешное подключение к базе данных MongoDB");
 
-    // 2. Обязательный мидлвар для чтения JSON в POST-запросах (СТРОГО перед роутами)
+    // 1. JSON-парсер — первым
     app.use(express.json());
 
-    // 3. Тестовый корневой роут
+    // 2. Мидлвар с user — ВТОРЫМ, ПЕРЕД ВСЕМИ роутами
+    app.use((req: Request, res: Response, next: NextFunction) => {
+      res.locals.user = { _id: "6a55f044f50ff10b98addf21" };
+      next();
+    });
+
+    // 3. Все роуты ПОСЛЕ мидлвара
     app.get("/", (req: Request, res: Response) => {
       res.send("Сервер работает и подключен к MongoDB!");
     });
 
-    // 4. Монтируем роутер пользователей
     app.use("/users", userRouter);
+    app.use("/cards", cardsRouter);
 
-    // app.use((req: Request, res: Response, next: NextFunction) => {
-    //   req.user = {
-    //     _id: "6a5504f285cb404c7f78bf41", // вставьте сюда _id созданного в предыдущем пункте пользователя
-    //   };
-
-    //   next();
-    // });
-
-    // 5. И только теперь запускаем сервер на прослушивание портов
     app.listen(PORT, () => {
       console.log(`Сервер запущен на http://localhost:${PORT}`);
     });
@@ -48,5 +45,4 @@ async function startServer() {
   }
 }
 
-// Запускаем инициализацию всей цепочки
 startServer();

@@ -1,11 +1,18 @@
 import { Router } from "express";
-import { getCards, deleteCardId, createCard } from "../controllers/cards";
+import {
+  getCards,
+  createCard,
+  deleteCard,
+  likeCard,
+  dislikeCard,
+} from "../controllers/cards";
 
 const router = Router();
 
-// Настройка путей в соответствии со спецификацией задания
 router.get("/", getCards);
 router.post("/", createCard);
-router.delete("/:userId", deleteCardId);
+router.delete("/:cardId", deleteCard);
+router.put("/:cardId/likes", likeCard);
+router.delete("/:cardId/likes", dislikeCard);
 
 export default router;
