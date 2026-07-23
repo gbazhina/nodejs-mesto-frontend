@@ -1,4 +1,4 @@
-import { URL_REGEX } from "const";
+import { URL_REGEX } from "../const";
 import { Schema, model, Document } from "mongoose";
 /* eslint-disable import/no-extraneous-dependencies */
 import validator from "validator";
