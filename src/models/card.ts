@@ -1,3 +1,4 @@
+import { URL_REGEX } from "const";
 import { Schema, model, Document } from "mongoose";
 
 // Интерфейс карточки для TypeScript
@@ -20,6 +21,10 @@ const cardSchema = new Schema<ICard>({
   link: {
     type: String,
     required: true,
+    validate: {
+      validator: (value: string) => URL_REGEX.test(value),
+      message: "Некорректный формат ссылки",
+    },
   },
   owner: {
     type: Schema.Types.ObjectId,

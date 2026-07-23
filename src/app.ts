@@ -1,10 +1,17 @@
 import { webcrypto } from "node:crypto";
-import express, { Application, NextFunction, Request, Response } from "express";
+import express, { Application, Request, Response } from "express";
 import mongoose from "mongoose";
+import { errors } from "celebrate";
 import userRouter from "./routes/users";
 import cardsRouter from "./routes/cards";
+import login from "./controllers/login";
+import { createUser } from "./controllers/users";
+import auth from "./middlewares/auth";
+import { requestLogger, errorLogger } from "./middlewares/logger";
+import errorHandler from "./middlewares/error-handler";
+import { NotFoundError } from "./errors";
+import { validateLogin, validateCreateUser } from "./validators";
 
-// Полифил для глобального crypto (Mongoose использует его для генерации ObjectId)
 if (!globalThis.crypto) {
   (globalThis as any).crypto = webcrypto;
 }
@@ -18,28 +25,35 @@ async function startServer() {
     await mongoose.connect(DB_URL);
     console.log("Успешное подключение к базе данных MongoDB");
 
-    // 1. JSON-парсер — первым
     app.use(express.json());
 
-    // 2. Мидлвар с user — ВТОРЫМ, ПЕРЕД ВСЕМИ роутами
-    app.use((req: Request, res: Response, next: NextFunction) => {
-      res.locals.user = { _id: "6a55f044f50ff10b98addf21" };
-      next();
-    });
+    app.use(requestLogger);
 
-    // 3. Все роуты ПОСЛЕ мидлвара
-    app.get("/", (req: Request, res: Response) => {
-      res.send("Сервер работает и подключен к MongoDB!");
-    });
+    // Публичные роуты с валидацией
+    app.post("/signin", validateLogin, login);
+    app.post("/signup", validateCreateUser, createUser);
 
+    // Защищённые роуты
+    app.use(auth);
     app.use("/users", userRouter);
     app.use("/cards", cardsRouter);
+
+    app.use((req: Request, res: Response, next) => {
+      next(new NotFoundError("Ресурс не найден"));
+    });
+
+    app.use(errorLogger);
+
+    // Обработчик ошибок celebrate — перед централизованным!
+    app.use(errors());
+
+    app.use(errorHandler);
 
     app.listen(PORT, () => {
       console.log(`Сервер запущен на http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error("Ошибка при запуске сервера или подключении к БД:", error);
+    console.error("Ошибка при запуске сервера:", error);
     process.exit(1);
   }
 }

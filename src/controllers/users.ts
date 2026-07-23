@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
+import bcrypt from "bcryptjs";
 import User from "../models/user";
+import { BadRequestError, NotFoundError, ConflictError } from "../errors";
 
-// GET /users — возвращает всех пользователей
 export const getUsers = async (
   req: Request,
   res: Response,
@@ -10,76 +11,83 @@ export const getUsers = async (
   try {
     const users = await User.find({});
     res.status(200).json(users);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: "На сервере произошла ошибка", error: error.message });
+  } catch (err) {
+    next(err);
   }
 };
 
-// GET /users/:userId — возвращает пользователя по _id
 export const getUserById = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { userId } = req.params;
-    const user = await User.findById(userId);
+    const user = await User.findById(req.params.userId);
 
     if (!user) {
-      res
-        .status(404)
-        .json({ message: "Пользователь с указанным _id не найден" });
-      return;
+      throw new NotFoundError("Пользователь не найден");
     }
 
     res.status(200).json(user);
-  } catch (error: any) {
-    if (error.name === "CastError") {
-      res.status(400).json({ message: "Передан некорректный id пользователя" });
-      return;
-    }
-    res
-      .status(500)
-      .json({ message: "На сервере произошла ошибка", error: error.message });
+  } catch (err) {
+    next(err);
   }
 };
 
-// POST /users — создаёт пользователя
+export const getCurrentUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const user = await User.findById(req.user?._id);
+
+    if (!user) {
+      throw new NotFoundError("Пользователь не найден");
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const createUser = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { name, about, avatar } = req.body;
+    const { name, about, avatar, email, password } = req.body;
 
-    if (!name || !about || !avatar) {
-      res.status(400).json({
-        message: "Переданы некорректные данные при создании пользователя",
-      });
-      return;
+    if (!email || !password) {
+      throw new BadRequestError(
+        "Переданы некорректные данные при создании пользователя",
+      );
     }
 
-    const newUser = new User({ name, about, avatar });
-    await newUser.save();
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    res.status(201).json(newUser);
-  } catch (error: any) {
-    if (error.name === "ValidationError") {
-      res
-        .status(400)
-        .json({ message: "Ошибка валидации данных", error: error.message });
-      return;
-    }
-    res
-      .status(500)
-      .json({ message: "На сервере произошла ошибка", error: error.message });
+    const newUser = await User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hashedPassword,
+    });
+
+    res.status(201).json({
+      _id: newUser._id,
+      name: newUser.name,
+      about: newUser.about,
+      avatar: newUser.avatar,
+      email: newUser.email,
+    });
+  } catch (err) {
+    next(err);
   }
 };
 
-// PATCH /users/me — обновляет профиль
 export const updateProfile = async (
   req: Request,
   res: Response,
@@ -87,45 +95,23 @@ export const updateProfile = async (
 ): Promise<void> => {
   try {
     const { name, about } = req.body;
-    const userId = (res.locals as any).user._id;
-
-    if (!name && !about) {
-      res.status(400).json({
-        message: "Переданы некорректные данные при обновлении профиля",
-      });
-      return;
-    }
-
-    const updateData: any = {};
-    if (name) updateData.name = name;
-    if (about) updateData.about = about;
 
     const user = await User.findByIdAndUpdate(
-      userId,
-      updateData,
-      { new: true, runValidators: true }
+      req.user?._id,
+      { name, about },
+      { new: true, runValidators: true },
     );
 
     if (!user) {
-      res.status(404).json({ message: "Пользователь с указанным _id не найден" });
-      return;
+      throw new NotFoundError("Пользователь не найден");
     }
 
     res.status(200).json(user);
-  } catch (error: any) {
-    if (error.name === "ValidationError") {
-      res.status(400).json({ message: "Ошибка валидации данных", error: error.message });
-      return;
-    }
-    if (error.name === "CastError") {
-      res.status(400).json({ message: "Передан некорректный id пользователя" });
-      return;
-    }
-    res.status(500).json({ message: "На сервере произошла ошибка", error: error.message });
+  } catch (err) {
+    next(err);
   }
 };
 
-// PATCH /users/me/avatar — обновляет аватар
 export const updateAvatar = async (
   req: Request,
   res: Response,
@@ -133,36 +119,19 @@ export const updateAvatar = async (
 ): Promise<void> => {
   try {
     const { avatar } = req.body;
-    const userId = (res.locals as any).user._id;
-
-    if (!avatar) {
-      res.status(400).json({
-        message: "Переданы некорректные данные при обновлении аватара",
-      });
-      return;
-    }
 
     const user = await User.findByIdAndUpdate(
-      userId,
+      req.user?._id,
       { avatar },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!user) {
-      res.status(404).json({ message: "Пользователь с указанным _id не найден" });
-      return;
+      throw new NotFoundError("Пользователь не найден");
     }
 
     res.status(200).json(user);
-  } catch (error: any) {
-    if (error.name === "ValidationError") {
-      res.status(400).json({ message: "Ошибка валидации данных", error: error.message });
-      return;
-    }
-    if (error.name === "CastError") {
-      res.status(400).json({ message: "Передан некорректный id пользователя" });
-      return;
-    }
-    res.status(500).json({ message: "На сервере произошла ошибка", error: error.message });
+  } catch (err) {
+    next(err);
   }
 };
