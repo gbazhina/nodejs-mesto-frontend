@@ -1,6 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import { CustomError } from "../errors";
 
+interface MongoError extends Error {
+  code?: number;
+  keyValue?: Record<string, unknown>;
+}
+
 const errorHandler = (
   err: Error | CustomError,
   req: Request,
@@ -13,7 +18,9 @@ const errorHandler = (
   }
 
   // Ошибка дубликата MongoDB (unique: true)
-  if ((err as any).code === 11000) {
+  const mongoErr = err as MongoError;
+
+  if (mongoErr.code === 11000) {
     res
       .status(409)
       .json({ message: "Пользователь с таким email уже существует" });

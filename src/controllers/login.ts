@@ -32,13 +32,7 @@ const login = async (
 
     const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
 
-    res.cookie("jwt", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      sameSite: "strict",
-    });
-
-    res.status(200).json({ message: "Авторизация успешна" });
+    res.status(200).json({ token });
   } catch (err) {
     next(err);
   }

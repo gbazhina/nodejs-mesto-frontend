@@ -21,9 +21,10 @@ const auth = (req: Request, res: Response, next: NextFunction): void => {
     }
 
     const token = authorization.replace("Bearer ", "");
-    const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
-    req.user = payload as any;
+    const payload = jwt.verify(token, JWT_SECRET) as { _id: string };
+
+    req.user = payload;
     next();
   } catch (err) {
     next(new UnauthorizedError());

@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { webcrypto } from "node:crypto";
 import express, { Application, Request, Response } from "express";
 import mongoose from "mongoose";
@@ -12,13 +14,18 @@ import errorHandler from "./middlewares/error-handler";
 import { NotFoundError } from "./errors";
 import { validateLogin, validateCreateUser } from "./validators";
 
+declare global {
+  // eslint-disable-next-line no-var
+  var crypto: Crypto;
+}
+
 if (!globalThis.crypto) {
-  (globalThis as any).crypto = webcrypto;
+  globalThis.crypto = webcrypto as unknown as Crypto;
 }
 
 const app: Application = express();
-const PORT: number = 3000;
-const DB_URL: string = "mongodb://localhost:27017/mestodb";
+const PORT = process.env.PORT || 3000;
+const DB_URL = process.env.DB_URL || "mongodb://localhost:27017/mestodb";
 
 async function startServer() {
   try {
