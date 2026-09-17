@@ -12,11 +12,10 @@ const {
 module.exports = {
   apps: [
     {
-      name: 'mesto-backend',
-      script: 'dist/app.js',
-      cwd: `${DEPLOY_PATH}/current`,
+      name: "mesto-backend",
+      script: "dist/app.js",
       env: {
-        NODE_ENV: 'production',
+        NODE_ENV: "production",
       },
     },
   ],
@@ -25,21 +24,21 @@ module.exports = {
     production: {
       user: DEPLOY_USER,
       host: DEPLOY_SERVER,
-      ref: 'origin/main',
+      ref: "origin/main",
       repo: DEPLOY_REPO,
       path: DEPLOY_PATH,
 
       // Копируем .env с локального компьютера в shared-папку на сервере
       // (эта папка сохраняется между деплоями)
-      'pre-deploy-local': `scp .env ${DEPLOY_USER}@${DEPLOY_SERVER}:${DEPLOY_PATH}/shared/.env`,
+      "pre-deploy-local": `scp .env ${DEPLOY_USER}@${DEPLOY_SERVER}:${DEPLOY_PATH}/shared/.env`,
 
       // Устанавливаем зависимости, собираем TS -> JS, подключаем .env, перезапускаем через pm2
-      'post-deploy': [
-        'npm install',
-        'npm run build',
+      "post-deploy": [
+        "npm install",
+        "npm run build",
         `ln -sf ${DEPLOY_PATH}/shared/.env .env`,
-        'pm2 reload ecosystem.config.js --env production',
-      ].join(' && '),
+        "pm2 reload ecosystem.config.js --env production",
+      ].join(" && "),
     },
   },
 };
