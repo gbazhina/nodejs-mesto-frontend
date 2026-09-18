@@ -1,4 +1,5 @@
 const path = require("path");
+const path = require("path");
 let DEPLOY_SERVER, DEPLOY_USER, DEPLOY_REPO, DEPLOY_PATH;
 
 try {
