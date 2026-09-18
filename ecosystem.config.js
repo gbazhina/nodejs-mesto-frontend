@@ -1,3 +1,4 @@
+const path = require("path");
 let DEPLOY_SERVER, DEPLOY_USER, DEPLOY_REPO, DEPLOY_PATH;
 
 try {
@@ -12,7 +13,8 @@ module.exports = {
   apps: [
     {
       name: "mesto-backend",
-      script: "backend/dist/app.js",
+      script: "dist/app.js",
+      cwd: path.join(__dirname, "backend"),
       env: {
         NODE_ENV: "production",
       },
