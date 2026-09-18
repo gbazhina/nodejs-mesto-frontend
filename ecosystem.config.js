@@ -1,10 +1,10 @@
 const path = require("path");
 
-let DEPLOY_SERVER, DEPLOY_USER, DEPLOY_REPO, DEPLOY_PATH;
+let DEPLOY_SERVER, DEPLOY_USER, DEPLOY_REPO, DEPLOY_PATH, DEPLOY_BRANCH;
 
 try {
-  require("dotenv").config({ path: ".env.deploy" });
-  ({ DEPLOY_SERVER, DEPLOY_USER, DEPLOY_REPO, DEPLOY_PATH } = process.env);
+  require('dotenv').config({ path: '.env.deploy' });
+  ({ DEPLOY_SERVER, DEPLOY_USER, DEPLOY_REPO, DEPLOY_PATH, DEPLOY_BRANCH } = process.env);
 } catch (e) {
   // На сервере .env.deploy и dotenv не нужны — эти переменные
   // используются только локально, при запуске "pm2 deploy"
@@ -26,7 +26,7 @@ module.exports = {
     production: {
       user: DEPLOY_USER,
       host: DEPLOY_SERVER,
-      ref: "origin/main",
+      ref: `origin/${DEPLOY_BRANCH || "main"}`,
       repo: DEPLOY_REPO,
       path: DEPLOY_PATH,
 
