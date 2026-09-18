@@ -33,12 +33,24 @@ async function startServer() {
     await mongoose.connect(DB_URL);
     console.log("Успешное подключение к базе данных MongoDB");
 
-    app.use(
-      cors({
-        origin: "https://bazhina.nomorepartiessite.ru",
-        credentials: true,
-      }),
-    );
+    app.use((req, res, next) => {
+      res.header(
+        "Access-Control-Allow-Origin",
+        "https://bazhina.nomorepartiessite.ru",
+      );
+      res.header("Access-Control-Allow-Credentials", "true");
+      res.header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+      );
+      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+      if (req.method === "OPTIONS") {
+        return res.sendStatus(204);
+      }
+
+      next();
+    });
 
     app.use(express.json());
 
