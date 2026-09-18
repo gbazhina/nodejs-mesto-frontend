@@ -12,10 +12,10 @@ const {
 module.exports = {
   apps: [
     {
-      name: "mesto-backend",
-      script: "dist/app.js",
+      name: 'mesto-backend',
+      script: 'backend/dist/app.js',
       env: {
-        NODE_ENV: "production",
+        NODE_ENV: 'production',
       },
     },
   ],
@@ -24,21 +24,20 @@ module.exports = {
     production: {
       user: DEPLOY_USER,
       host: DEPLOY_SERVER,
-      ref: "origin/main",
+      ref: 'origin/main',
       repo: DEPLOY_REPO,
       path: DEPLOY_PATH,
 
-      // Копируем .env с локального компьютера в shared-папку на сервере
-      // (эта папка сохраняется между деплоями)
-      "pre-deploy-local": `scp .env ${DEPLOY_USER}@${DEPLOY_SERVER}:${DEPLOY_PATH}/shared/.env`,
+      // Копируем .env бэкенда в shared-папку на сервере (сохраняется между деплоями)
+      'pre-deploy-local': `scp backend/.env ${DEPLOY_USER}@${DEPLOY_SERVER}:${DEPLOY_PATH}/shared/.env`,
 
-      // Устанавливаем зависимости, собираем TS -> JS, подключаем .env, перезапускаем через pm2
-      "post-deploy": [
-        "npm install",
-        "npm run build",
-        `ln -sf ${DEPLOY_PATH}/shared/.env .env`,
-        "pm2 reload ecosystem.config.js --env production",
-      ].join(" && "),
+      // Собираем бэкенд, подключаем .env, собираем фронтенд, перезапускаем pm2
+      'post-deploy': [
+        'cd backend && npm install && npm run build && cd ..',
+        `ln -sf ${DEPLOY_PATH}/shared/.env backend/.env`,
+        'cd frontend && npm install && npm run build && cd ..',
+        'pm2 reload ecosystem.config.js --env production',
+      ].join(' && '),
     },
   },
 };
