@@ -1,3 +1,4 @@
+import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 import { webcrypto } from "node:crypto";
@@ -31,6 +32,13 @@ async function startServer() {
   try {
     await mongoose.connect(DB_URL);
     console.log("Успешное подключение к базе данных MongoDB");
+
+    app.use(
+      cors({
+        origin: "https://bazhina.nomorepartiessite.ru",
+        credentials: true,
+      }),
+    );
 
     app.use(express.json());
 
