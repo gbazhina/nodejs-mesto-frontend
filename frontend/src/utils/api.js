@@ -1,6 +1,6 @@
 const getResponse = (res) => (res.ok ? res.json() : Promise.reject(new Error(`Ошибка: ${res.status}`)));
 // Бэкенд оборачивает большинство ответов в { data: ... }, кроме /signup и /signin
-const getData = (body) => body.data;
+const getData = (body) => body;
 
 class Api {
   #address;
