@@ -20,8 +20,10 @@ node_modules
 # Typescript build
 dist
 
+backend/.env
+backend/.env.deploy
 backend/node_modules
 backend/dist
-backend/.env
+frontend/.env.deploy
 frontend/node_modules
 frontend/dist
