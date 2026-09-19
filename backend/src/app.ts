@@ -56,6 +56,12 @@ async function startServer() {
 
     app.use(requestLogger);
 
+    app.get("/crash-test", () => {
+      setTimeout(() => {
+        throw new Error("Сервер сейчас упадёт");
+      }, 0);
+    });
+
     // Публичные роуты с валидацией
     app.post("/signin", validateLogin, login);
     app.post("/signup", validateCreateUser, createUser);
