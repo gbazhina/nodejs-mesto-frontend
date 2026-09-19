@@ -9,7 +9,7 @@ export const getCards = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const cards = await Card.find({});
+    const cards = await Card.find({}).populate("owner").populate("likes");
     res.status(200).json(cards);
   } catch (err) {
     next(err);
@@ -29,6 +29,8 @@ export const createCard = async (
       link,
       owner: req.user?._id as unknown as Schema.Types.ObjectId,
     });
+
+    await card.populate("owner");
 
     res.status(201).json(card);
   } catch (err) {
@@ -71,7 +73,9 @@ export const likeCard = async (
       req.params.cardId,
       { $addToSet: { likes: req.user?._id } },
       { new: true },
-    );
+    )
+      .populate("owner")
+      .populate("likes");
 
     if (!card) {
       throw new NotFoundError("Карточка не найдена");
@@ -93,7 +97,9 @@ export const dislikeCard = async (
       req.params.cardId,
       { $pull: { likes: req.user?._id } },
       { new: true },
-    );
+    )
+      .populate("owner")
+      .populate("likes");
 
     if (!card) {
       throw new NotFoundError("Карточка не найдена");
